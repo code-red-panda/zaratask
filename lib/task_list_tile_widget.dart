@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:zaratask/database/app_database.dart';
 import 'package:zaratask/database/queries.dart';
+import 'package:zaratask/flagged_icon_widget.dart';
 import 'package:zaratask/remind_me_at_icon_widget.dart';
 import 'package:zaratask/task_list_page.dart';
 
@@ -149,7 +150,7 @@ class _TaskListTileWidgetState extends State<TaskListTileWidget> {
               // On changed, if isComplete has changed, update isComplete field.
               onChanged: (value) async {
                 if (value != null && value != widget.task.isComplete) {
-                  await AppQueries.updateTaskCompleteById(
+                  await AppQueries.updateTaskIsCompleteById(
                     widget.task.id,
                     isComplete: value,
                   );
@@ -158,9 +159,13 @@ class _TaskListTileWidgetState extends State<TaskListTileWidget> {
         ),
         Column(
           children: [
-            const Row(
+            Row(
               children: [
-                RemindMeAtIconWidget(),
+                const RemindMeAtIconWidget(),
+                FlaggedIconWidget(
+                  widget.task.id,
+                  isFlagged: widget.task.isFlagged,
+                ),
               ],
             ),
             // Remind Me Builder

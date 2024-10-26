@@ -6,8 +6,20 @@ import 'package:zaratask/database/app_database.dart';
 import 'package:zaratask/exceptions.dart';
 
 class AppQueries {
+  /// Returns the number of rows deleted
+  static Future<int> deleteTaskById(int id) async {
+    final q =
+        appDatabase.managers.tasks.filter((f) => f.id.equals(id)).delete();
+
+    if (kDebugMode) {
+      debugPrint('deleteTaskById($id)');
+    }
+
+    return _execute<int>(q);
+  }
+
   /// Returns the number of rows updated
-  static Future<int> updateTaskCompleteById(
+  static Future<int> updateTaskIsCompleteById(
     int id, {
     required bool isComplete,
   }) async {
@@ -17,6 +29,22 @@ class AppQueries {
 
     if (kDebugMode) {
       debugPrint('updateTaskCompleteById($id, $isComplete)');
+    }
+
+    return _execute<int>(q);
+  }
+
+  /// Returns the number of rows updated
+  static Future<int> updateTaskIsFlaggedById(
+    int id, {
+    required bool isFlagged,
+  }) async {
+    final q = appDatabase.managers.tasks
+        .filter((f) => f.id.equals(id))
+        .update((o) => o(isFlagged: Value(isFlagged)));
+
+    if (kDebugMode) {
+      debugPrint('updateTaskIsFlaggedById($id, $isFlagged)');
     }
 
     return _execute<int>(q);

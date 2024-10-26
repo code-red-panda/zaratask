@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:zaratask/database/queries.dart';
 import 'package:zaratask/date_time_functions.dart';
 import 'package:zaratask/database/app_database.dart';
 import 'package:zaratask/task_list_tile_widget.dart';
@@ -92,9 +93,29 @@ class TaskListPage extends StatelessWidget {
                     final hasFocus = result[index].name.isEmpty &&
                         result.length == index + 1;
 
-                    return TaskListTileWidget(
-                      task: result[index],
-                      hasFocus: hasFocus,
+                    return Dismissible(
+                      key: Key('${result[index].id}'),
+                      direction: DismissDirection.endToStart,
+                      dismissThresholds: const {
+                        DismissDirection.startToEnd: 0.6,
+                        DismissDirection.endToStart: 0.6,
+                      },
+
+                      // Delete the task from the database.
+                      onDismissed: (direction) async {
+                        await AppQueries.deleteTaskById(result[index].id);
+                      },
+                      resizeDuration: const Duration(milliseconds: 900),
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      child: TaskListTileWidget(
+                        task: result[index],
+                        hasFocus: hasFocus,
+                      ),
                     );
                   },
                   itemCount: result.length,
