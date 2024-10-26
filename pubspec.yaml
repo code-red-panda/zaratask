@@ -9,11 +9,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  drift: ^2.21.0
+  drift_flutter: ^0.2.1
+  form_validator: ^2.1.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  very_good_analysis: ^6.0.0
+  drift_dev: ^2.21.2
+  build_runner: ^2.4.13
 
 flutter:
   uses-material-design: true

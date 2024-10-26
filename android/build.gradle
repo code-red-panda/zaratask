@@ -16,3 +16,14 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+/// This snippet disallows the app to run on Android 32 bit devices.
+/// This requirement is from the drift_flutter sqlite libs.
+/// https://github.com/simolus3/sqlite3.dart/tree/main/sqlite3_flutter_libs#included-platforms
+android {
+    defaultConfig {
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+        }
+    }
+}
