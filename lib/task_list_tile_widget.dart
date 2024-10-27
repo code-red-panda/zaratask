@@ -5,6 +5,7 @@ import 'package:zaratask/database/queries.dart';
 import 'package:zaratask/flagged_icon_widget.dart';
 import 'package:zaratask/remind_me_at_icon_widget.dart';
 import 'package:zaratask/task_list_page.dart';
+import 'package:zaratask/url_icon_widget.dart';
 
 class TaskListTileWidget extends StatefulWidget {
   const TaskListTileWidget({
@@ -39,6 +40,23 @@ class _TaskListTileWidgetState extends State<TaskListTileWidget> {
       _nameFocusNode.requestFocus();
     }
 
+    // If the name text field loses focus and the name is empty, delete the
+    // task (this is an assumption on user experience).
+    _nameFocusNode.addListener(() async {
+      if (!_nameFocusNode.hasFocus &&
+          _nameTextController.text.isEmpty &&
+          !_noteFocusNode.hasFocus) {
+        await AppQueries.deleteTaskById(widget.task.id);
+      }
+    });
+
+    _noteFocusNode.addListener(() async {
+      if (!_nameFocusNode.hasFocus &&
+          _nameTextController.text.isEmpty &&
+          !_noteFocusNode.hasFocus) {
+        await AppQueries.deleteTaskById(widget.task.id);
+      }
+    });
     super.initState();
   }
 
@@ -84,20 +102,6 @@ class _TaskListTileWidgetState extends State<TaskListTileWidget> {
                 }
               }
             },
-
-            /// On tap outside, if name has changed, only update name field.
-            onTapOutside: (event) async {
-              print('name tap outside');
-              if (taskListFormKey.currentState?.validate() ?? false) {
-                if (widget.task.name != _nameTextController.text) {
-                  await AppQueries.updateTaskNameById(
-                    widget.task.id,
-                    name: _nameTextController.text,
-                  );
-                }
-                _nameFocusNode.unfocus();
-              }
-            },
             style: Theme.of(context).textTheme.bodyLarge,
             textCapitalization: TextCapitalization.words,
             validator: ValidationBuilder().minLength(2).build(),
@@ -123,45 +127,34 @@ class _TaskListTileWidgetState extends State<TaskListTileWidget> {
                       note: _noteTextController.text,
                     );
                   }
+
                   _noteFocusNode.unfocus();
                 }
-              }
-            },
-
-            // On tap outside, if note has changed, only update note field.
-            onTapOutside: (event) async {
-              print('note tap outside');
-              if (taskListFormKey.currentState?.validate() ?? false) {
-                if (widget.task.note != _noteTextController.text) {
-                  await AppQueries.updateTaskNoteById(
-                    widget.task.id,
-                    note: _noteTextController.text,
-                  );
-                }
-                _noteFocusNode.unfocus();
               }
             },
             style: Theme.of(context).textTheme.bodySmall,
             textCapitalization: TextCapitalization.sentences,
           ),
           trailing: Checkbox(
-              value: widget.task.isComplete,
+            value: widget.task.isComplete,
 
-              // On changed, if isComplete has changed, update isComplete field.
-              onChanged: (value) async {
-                if (value != null && value != widget.task.isComplete) {
-                  await AppQueries.updateTaskIsCompleteById(
-                    widget.task.id,
-                    isComplete: value,
-                  );
-                }
-              }),
+            // On changed, if isComplete has changed, update isComplete field.
+            onChanged: (value) async {
+              if (value != null && value != widget.task.isComplete) {
+                await AppQueries.updateTaskIsCompleteById(
+                  widget.task.id,
+                  isComplete: value,
+                );
+              }
+            },
+          ),
         ),
         Column(
           children: [
             Row(
               children: [
                 const RemindMeAtIconWidget(),
+                UrlIconWidget(widget.task.id, hasUrl: false),
                 FlaggedIconWidget(
                   widget.task.id,
                   isFlagged: widget.task.isFlagged,
